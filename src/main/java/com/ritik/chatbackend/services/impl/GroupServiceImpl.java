@@ -29,12 +29,18 @@ public class GroupServiceImpl implements GroupService {
         group.setName(request.getName());
         Group saved = groupRepository.save(group);
         user.getGroups().add(saved);
+        userRepository.save(user);
 
         return new GroupDto(saved.getName());
     }
 
     @Override
     public boolean isGroupExists(String groupName) {
-        return groupRepository.findByName(groupName);
+        return groupRepository.existsByName(groupName);
+    }
+
+    @Override
+    public Group getGroupByName(String groupName) {
+        return groupRepository.findByName(groupName).orElseThrow(() -> new IllegalArgumentException("Group not found"));
     }
 }

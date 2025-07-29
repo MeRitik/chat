@@ -29,6 +29,11 @@ public class AppUserServicesImpl implements AppUserServices {
                 .build();
 
         AppUser saved = userRepository.save(user);
-        return new UserDto(user.getName(), user.getUsername());
+        return new UserDto(saved.getName(), saved.getUsername());
+    }
+
+    @Override
+    public AppUser findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 }

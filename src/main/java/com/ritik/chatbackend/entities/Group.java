@@ -1,9 +1,6 @@
 package com.ritik.chatbackend.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,13 +18,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@Table(name = "`groups`")
 public class Group {
 
     @Id
     private Integer id;
 
     private String name;
+
+    @ManyToMany
     List<AppUser> participants;
+
+    @OneToMany(cascade = CascadeType.ALL)
     List<Message> messages;
 
     @CreatedDate

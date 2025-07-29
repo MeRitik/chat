@@ -24,8 +24,9 @@ public class Message {
 
     @OneToOne
     private AppUser sender;
-    @OneToOne
-    private AppUser receiver;
+
+    @ManyToOne
+    private Group group;
     private String message;
 
     @CreatedDate

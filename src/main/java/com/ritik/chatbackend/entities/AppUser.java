@@ -1,11 +1,9 @@
 package com.ritik.chatbackend.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,6 +11,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class AppUser {
 
     @Id
@@ -23,5 +22,5 @@ public class AppUser {
     private String password;
 
     @OneToMany
-    private List<Group> groups;
+    private List<Group> groups = new ArrayList<>();
 }

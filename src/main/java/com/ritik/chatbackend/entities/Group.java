@@ -10,6 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,19 +19,20 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "`groups`")
+@Table(name = "chat_groups")
 public class Group {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String name;
 
     @ManyToMany
-    List<AppUser> participants;
+    List<AppUser> participants = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL)
-    List<Message> messages;
+    List<Message> messages = new ArrayList<>();
 
     @CreatedDate
     @Column(updatable = false, nullable = false)

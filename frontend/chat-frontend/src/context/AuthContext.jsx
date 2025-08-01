@@ -67,7 +67,7 @@ const AuthProvider = ({ children }) => {
             localStorage.setItem("name", name);
             return { success: true };
         } catch (error) {
-            console.error("Login error:", error);
+            toast.error("Login error:", error);
             return { success: false, error: error.message };
         }
     };

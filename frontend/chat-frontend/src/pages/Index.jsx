@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { MessageCircle, User, Users, MessageSquare, Settings, LogOut, Search } from 'lucide-react';
+import AuthContext from '../context/AuthContext';
 
 export default function Index() {
     const [mounted, setMounted] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
+    const { logout } = useContext(AuthContext);
 
     // Get current active tab from URL
     const getCurrentTab = () => {
@@ -130,7 +132,7 @@ export default function Index() {
                             <Settings className="w-4 h-4" />
                             Settings
                         </button>
-                        <button className="flex items-center justify-center px-3 py-2 bg-gray-700 hover:bg-red-600 rounded-lg text-gray-300 hover:text-white transition-all duration-200">
+                        <button onClick={() => logout()} className="flex items-center justify-center px-3 py-2 bg-gray-700 hover:bg-red-600 rounded-lg text-gray-300 hover:text-white transition-all duration-200">
                             <LogOut className="w-4 h-4" />
                         </button>
                     </div>

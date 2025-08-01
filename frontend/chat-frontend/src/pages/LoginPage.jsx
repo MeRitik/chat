@@ -3,6 +3,7 @@ import { MessageCircle, User, Mail, Lock, ArrowRight, Eye, EyeOff, MessageCircle
 import AuthContext from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { registerUser } from '../services/api';
 
 export default function LoginPage() {
     const navigate = useNavigate();
@@ -34,23 +35,69 @@ export default function LoginPage() {
         e.preventDefault();
         setIsLoading(true);
 
-        const loginResult = await login({ username: formData.email, password: formData.password });
+        if (isLogin) {
 
-        if (!loginResult.success) {
-            toast.error("Login failed: " + loginResult.error);
-        }
+            if (!formData.email || !formData.password) {
+                toast.error("Email and password are required");
+                setIsLoading(false);
+                return;
+            }
 
-        // Reset form data after submission
-        setFormData({
-            email: '',
-            password: '',
-            confirmPassword: '',
-            username: ''
-        });
+            const loginResult = await login({ username: formData.email, password: formData.password });
 
-        // Redirect to home page on successful login
-        if (loginResult.success) {
-            navigate('/home');
+            if (!loginResult.success) {
+                toast.error("Login failed: " + loginResult.error);
+            }
+
+            // Reset form data after submission
+            setFormData({
+                email: '',
+                password: '',
+                confirmPassword: '',
+                username: ''
+            });
+
+            // Redirect to home page on successful login
+            if (loginResult.success) {
+                toast.success("Login successful!");
+                navigate('/home');
+            }
+        } else {
+            // Logout Logic
+
+            if (!formData.email || !formData.password) {
+                toast.error("Email and password are required");
+                setIsLoading(false);
+                return;
+            }
+
+            if (formData.password !== formData.confirmPassword) {
+                toast.error("Passwords do not match");
+                setIsLoading(false);
+                return;
+            }
+
+            const requestData = {
+                name: formData.username,
+                username: formData.email,
+                password: formData.password
+            }
+
+            try {
+                const result = await registerUser(requestData);
+
+                if (!result) {
+                    throw new Error("Registration failed");
+                }
+
+                toast.success("Registration successful!");
+                toast.success("You can now login with your credentials.");
+
+                setIsLogin(true);
+            } catch (error) {
+                toast.error("Registration failed: " + error.message);
+            }
+
         }
 
         setIsLoading(false);
@@ -169,7 +216,7 @@ export default function LoginPage() {
                                 <input
                                     type="text"
                                     name="username"
-                                    placeholder="Username"
+                                    placeholder="Name"
                                     value={formData.username}
                                     onChange={handleInputChange}
                                     className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white text-sm placeholder-gray-400 focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all duration-200"

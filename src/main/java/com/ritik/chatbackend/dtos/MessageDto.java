@@ -8,7 +8,7 @@ import java.time.Instant;
 @Getter
 @Setter
 public class MessageDto {
-    private UserDto sender;
+    private CreateUserResponse sender;
     private GroupDto group;
     private String message;
     private Instant timestamp;

@@ -3,7 +3,7 @@ package com.ritik.chatbackend.controllers;
 import com.ritik.chatbackend.dtos.CreateUserRequest;
 import com.ritik.chatbackend.dtos.LoginRequestDto;
 import com.ritik.chatbackend.dtos.LoginResponseDto;
-import com.ritik.chatbackend.dtos.UserDto;
+import com.ritik.chatbackend.dtos.CreateUserResponse;
 import com.ritik.chatbackend.security.AuthService;
 import com.ritik.chatbackend.services.AppUserService;
 import lombok.AllArgsConstructor;
@@ -23,7 +23,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserDto> registerUser(@RequestBody CreateUserRequest request) {
+    public ResponseEntity<CreateUserResponse> registerUser(@RequestBody CreateUserRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userServices.registerUser(request));
     }
 

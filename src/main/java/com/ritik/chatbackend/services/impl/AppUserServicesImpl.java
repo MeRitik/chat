@@ -1,12 +1,13 @@
 package com.ritik.chatbackend.services.impl;
 
 import com.ritik.chatbackend.dtos.CreateUserRequest;
-import com.ritik.chatbackend.dtos.UserDto;
+import com.ritik.chatbackend.dtos.CreateUserResponse;
 import com.ritik.chatbackend.entities.AppUser;
 import com.ritik.chatbackend.repositories.AppUserRepository;
 import com.ritik.chatbackend.services.AppUserService;
 
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,7 @@ public class AppUserServicesImpl implements AppUserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public UserDto registerUser(CreateUserRequest request) {
+    public CreateUserResponse registerUser(CreateUserRequest request) {
         boolean alreadyExists = userRepository.findByUsername(request.getUsername()).isPresent();
         if (alreadyExists) {
             throw new IllegalArgumentException("Username already exists");
@@ -31,7 +32,7 @@ public class AppUserServicesImpl implements AppUserService {
                 .build();
 
         AppUser saved = userRepository.save(user);
-        return new UserDto(saved.getName(), saved.getUsername());
+        return new CreateUserResponse(saved.getName(), saved.getUsername(), HttpStatus.CREATED.value());
     }
 
     @Override

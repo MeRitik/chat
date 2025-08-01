@@ -33,4 +33,13 @@ public class JwtUtil {
                 .signWith(generateKey())
                 .compact();
     }
+
+    public String getUsernameFromToken(String token) {
+        return Jwts.parser()
+                .verifyWith(generateKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+    }
 }

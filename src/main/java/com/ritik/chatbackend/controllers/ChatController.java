@@ -5,7 +5,7 @@ import com.ritik.chatbackend.entities.AppUser;
 import com.ritik.chatbackend.entities.Group;
 import com.ritik.chatbackend.entities.Message;
 import com.ritik.chatbackend.repositories.MessageRepository;
-import com.ritik.chatbackend.services.AppUserServices;
+import com.ritik.chatbackend.services.AppUserService;
 import com.ritik.chatbackend.services.GroupService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Controller;
 public class ChatController {
 
     private final GroupService groupService;
-    private final AppUserServices appUserServices;
+    private final AppUserService appUserServices;
     private final MessageRepository messageRepository;
     private final ModelMapper modelMapper;
 

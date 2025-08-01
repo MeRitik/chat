@@ -4,7 +4,7 @@ import com.ritik.chatbackend.dtos.CreateUserRequest;
 import com.ritik.chatbackend.dtos.UserDto;
 import com.ritik.chatbackend.entities.AppUser;
 
-public interface AppUserServices {
+public interface AppUserService {
     UserDto registerUser(CreateUserRequest createUserRequest);
     AppUser findByUsername(String username);
 }

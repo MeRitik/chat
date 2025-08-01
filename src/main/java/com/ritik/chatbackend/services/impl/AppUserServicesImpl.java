@@ -4,7 +4,7 @@ import com.ritik.chatbackend.dtos.CreateUserRequest;
 import com.ritik.chatbackend.dtos.UserDto;
 import com.ritik.chatbackend.entities.AppUser;
 import com.ritik.chatbackend.repositories.AppUserRepository;
-import com.ritik.chatbackend.services.AppUserServices;
+import com.ritik.chatbackend.services.AppUserService;
 
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class AppUserServicesImpl implements AppUserServices {
+public class AppUserServicesImpl implements AppUserService {
 
     private final AppUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;

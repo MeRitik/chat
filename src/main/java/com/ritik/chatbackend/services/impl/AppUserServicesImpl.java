@@ -7,6 +7,7 @@ import com.ritik.chatbackend.repositories.AppUserRepository;
 import com.ritik.chatbackend.services.AppUserServices;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class AppUserServicesImpl implements AppUserServices {
 
     private final AppUserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDto registerUser(CreateUserRequest request) {
@@ -25,7 +27,7 @@ public class AppUserServicesImpl implements AppUserServices {
         AppUser user = AppUser.builder()
                 .name(request.getName())
                 .username(request.getUsername())
-                .password(request.getPassword())
+                .password(passwordEncoder.encode(request.getPassword()))
                 .build();
 
         AppUser saved = userRepository.save(user);

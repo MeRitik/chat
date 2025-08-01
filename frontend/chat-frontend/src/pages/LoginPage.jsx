@@ -1,7 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { MessageCircle, User, Mail, Lock, ArrowRight, Eye, EyeOff, MessageCircleMore } from 'lucide-react';
+import AuthContext from '../context/AuthContext';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
+    const navigate = useNavigate();
     const [isLogin, setIsLogin] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
@@ -12,6 +16,8 @@ export default function LoginPage() {
     });
     const [isLoading, setIsLoading] = useState(false);
     const [mounted, setMounted] = useState(false);
+
+    const { login } = useContext(AuthContext);
 
     useEffect(() => {
         setMounted(true);
@@ -28,10 +34,25 @@ export default function LoginPage() {
         e.preventDefault();
         setIsLoading(true);
 
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        const loginResult = await login({ username: formData.email, password: formData.password });
 
-        console.log(isLogin ? 'Login attempted' : 'Signup attempted', formData);
+        if (!loginResult.success) {
+            toast.error("Login failed: " + loginResult.error);
+        }
+
+        // Reset form data after submission
+        setFormData({
+            email: '',
+            password: '',
+            confirmPassword: '',
+            username: ''
+        });
+
+        // Redirect to home page on successful login
+        if (loginResult.success) {
+            navigate('/home');
+        }
+
         setIsLoading(false);
     };
 

@@ -6,7 +6,8 @@ const RequireAuth = ({ children }) => {
     const { isAuthenticated } = useContext(AuthContext);
     const location = useLocation();
 
-    if (!isAuthenticated) {
+    if (!isAuthenticated()) {
+        console.log("User is not authenticated, redirecting to login page.");
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 

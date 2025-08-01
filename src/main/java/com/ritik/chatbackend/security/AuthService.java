@@ -27,6 +27,7 @@ public class AuthService {
         return LoginResponseDto.builder()
                 .token(jwt)
                 .username(user.getUsername())
+                .name(user.getName())
                 .build();
     }
 }

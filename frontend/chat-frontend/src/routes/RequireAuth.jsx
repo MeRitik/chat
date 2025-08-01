@@ -6,9 +6,16 @@ const RequireAuth = ({ children }) => {
     const { isAuthenticated } = useContext(AuthContext);
     const location = useLocation();
 
-    if (!isAuthenticated()) {
+    const isAuth = isAuthenticated();
+
+    if (!isAuth) {
         console.log("User is not authenticated, redirecting to login page.");
         return <Navigate to="/login" state={{ from: location }} replace />;
+    }
+
+    if (isAuth && location.pathname === "/login") {
+        console.log("User is authenticated, redirecting to home page.");
+        return <Navigate to="/" replace />;
     }
 
     console.log("User is authenticated, rendering children components.");

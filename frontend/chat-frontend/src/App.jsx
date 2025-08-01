@@ -8,13 +8,21 @@ import Index from "./pages/Index";
 import ProfilePage from "./pages/ProfilePage";
 import JoinGroupPage from "./pages/JoinGroupPage";
 import ChatsListPage from "./pages/ChatsListPage";
+import CreateGroup from "./components/CreateGroup";
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/login"
+            element={
+              <RequireAuth>
+                <LoginPage />
+              </RequireAuth>
+            }
+          />
 
           <Route
             path="/"
@@ -29,6 +37,7 @@ function App() {
             <Route path="groups" element={<JoinGroupPage />} />
             <Route path="chats" element={<ChatsListPage />} />
             <Route path="chats/:chatId" element={<ChatsListPage />} />
+            <Route path="create" element={<CreateGroup />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

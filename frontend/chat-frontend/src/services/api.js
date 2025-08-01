@@ -19,3 +19,32 @@ export async function registerUser(userData) {
         console.error('Registration error:', error);
     }
 }
+
+// export async function checkAvailableGroupName(groupName) {
+//     const token = localStorage.getItem('token');
+//     console.log('Token being used:', token); // Debug log
+    
+//     try {
+//         const response = await fetch(`${API_BASE_URL}/group/${encodeURIComponent(groupName)}/exists`, {
+//             method: 'GET',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Authorization': `Bearer ${token}`,
+//             },
+//         });
+
+//         // Log the actual request headers
+//         console.log('Request headers:', {
+//             'Content-Type': 'application/json',
+//             'Authorization': `Bearer ${token}`,
+//         });
+
+//         if (!response.ok) {
+//             throw new Error('Server error while checking group name availability');
+//         }
+
+//         return await response.json();
+//     } catch (error) {
+//         console.error('Check group name availability error:', error);
+//     }
+// }

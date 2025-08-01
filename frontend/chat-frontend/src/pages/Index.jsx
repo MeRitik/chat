@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { MessageCircle, User, Users, MessageSquare, Settings, LogOut, Search } from 'lucide-react';
+import { MessageCircle, User, Users, MessageSquare, Settings, LogOut, Search, MessageSquarePlus } from 'lucide-react';
 import AuthContext from '../context/AuthContext';
 
 export default function Index() {
@@ -30,6 +30,13 @@ export default function Index() {
             count: null
         },
         {
+            id: 'chats',
+            path: '/chats',
+            icon: MessageSquare,
+            label: 'Chats',
+            count: 12
+        },
+        {
             id: 'groups',
             path: '/groups',
             icon: Users,
@@ -37,11 +44,11 @@ export default function Index() {
             count: null
         },
         {
-            id: 'chats',
-            path: '/chats',
-            icon: MessageSquare,
-            label: 'Chats',
-            count: 12
+            id: 'create',
+            path: '/create',
+            icon: MessageSquarePlus,
+            label: 'Create Chat',
+            count: null
         }
     ];
 

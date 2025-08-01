@@ -72,6 +72,32 @@ const AuthProvider = ({ children }) => {
         }
     };
 
+    async function checkAvailableGroupName(groupName) {
+        try {
+            const response = await fetch(`${VITE_BASE_URL}/group/${encodeURIComponent(groupName)}/exists`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            // Log the actual request headers
+            console.log('Request headers:', {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            });
+
+            if (!response.ok) {
+                throw new Error('Server error while checking group name availability');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Check group name availability error:', error);
+        }
+    }
+
     const logout = () => {
         setUser(null);
         setToken(null);
@@ -102,6 +128,7 @@ const AuthProvider = ({ children }) => {
         updateUser,
         isAuthenticated,
         getAuthHeader,
+        checkAvailableGroupName,
     };
 
     return (

@@ -9,8 +9,6 @@ export default function JoinGroupPage() {
     const { joinGroup } = useContext(AuthContext);
     const navigate = useNavigate();
 
-
-
     const handleJoinGroup = async () => {
         const response = await joinGroup(groupName);
         if (response.statusCode == 409 || response.statusCode == 404) {

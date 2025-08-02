@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
-import { Camera, Edit3, Eye, EyeOff, Check, X, Lock, MessageSquare } from 'lucide-react';
+import React, { useContext, useEffect, useState } from 'react';
+import { Camera, Edit3, Eye, EyeOff, Check, X, Lock, MessageSquare, Loader2 } from 'lucide-react';
+import AuthContext from '../context/AuthContext';
 
 export default function ProfilePage() {
+    const { getUserDetails } = useContext(AuthContext);
+
+    const [loading, setLoading] = useState(true);
     const [isEditingName, setIsEditingName] = useState(false);
     const [isEditingUsername, setIsEditingUsername] = useState(false);
     const [showPasswordFields, setShowPasswordFields] = useState(false);
@@ -11,16 +15,31 @@ export default function ProfilePage() {
         confirm: false,
     });
 
-    const [profileData, setProfileData] = useState({
-        name: 'John Doe',
-        username: 'johndoe',
-        status: 'Online',
-        totalChats: 142,
-    });
+    const [profileData, setProfileData] = useState(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            const response = await getUserDetails();
+            console.log(response)
+            setProfileData(response);
+            setLoading(false);
+        };
+        fetchData();
+    }, [getUserDetails]);
+
+    //  const [profileData, setProfileData] = useState({
+    //     name: 'John Doe',
+    //     username: 'johndoe',
+    //     status: 'Online',
+    //     totalChats: 142,
+    // });
+
+
 
     const [editData, setEditData] = useState({
-        name: profileData.name,
-        username: profileData.username,
+        name: profileData?.name || '',
+        username: profileData?.username || '',
     });
 
     const [passwordData, setPasswordData] = useState({
@@ -39,6 +58,14 @@ export default function ProfilePage() {
         setPasswordData({ current: '', new: '', confirm: '' });
         setShowPasswordFields(false);
     };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
+            </div>
+        );
+    }
 
     return (
         <div className="h-screen overflow-hidden flex">

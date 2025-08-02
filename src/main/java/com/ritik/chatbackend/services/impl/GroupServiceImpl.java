@@ -1,5 +1,7 @@
 package com.ritik.chatbackend.services.impl;
 
+import com.ritik.chatbackend.dtos.AddUserToGroupRequestDto;
+import com.ritik.chatbackend.dtos.AddUserToGroupResponseDto;
 import com.ritik.chatbackend.dtos.CreateGroupRequest;
 import com.ritik.chatbackend.dtos.GroupDto;
 import com.ritik.chatbackend.entities.AppUser;
@@ -8,14 +10,36 @@ import com.ritik.chatbackend.repositories.AppUserRepository;
 import com.ritik.chatbackend.repositories.GroupRepository;
 import com.ritik.chatbackend.services.GroupService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+
+@Slf4j
 @Service
 @AllArgsConstructor
 public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
     private final AppUserRepository userRepository;
+
+    @Override
+    public AddUserToGroupResponseDto addUserToGroup(AddUserToGroupRequestDto requestDto) {
+        Group group = groupRepository.findByName(requestDto.getGroupName()).orElseThrow(() -> new IllegalArgumentException("Group not found"));
+        AppUser user = userRepository.findByUsername(requestDto.getUsername()).orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if(group.getParticipants().contains(user) || user.getGroups().contains(group)) {
+            log.info("User {} already in group {}", user.getUsername(), group.getName());
+            throw new IllegalArgumentException("User already in group");
+        }
+
+        group.getParticipants().add(user);
+        user.getGroups().add(group);
+        groupRepository.save(group);
+        userRepository.save(user);
+
+        return new AddUserToGroupResponseDto(user.getUsername(), group.getName(), Instant.now(), true);
+    }
 
     @Override
     public GroupDto createGroup(String username, CreateGroupRequest request) {

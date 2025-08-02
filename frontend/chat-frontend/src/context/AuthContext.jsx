@@ -132,6 +132,19 @@ const AuthProvider = ({ children }) => {
         }
     }
 
+    async function joinGroup(groupName) {
+        try {
+            const response = await api.post('/groups/user', {
+                username: user,
+                groupName
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Join group error:', error);
+            throw error;
+        }
+    }
+
     const isAuthenticated = () => !!user && !!token;
 
     const getAuthHeader = () => {
@@ -149,6 +162,7 @@ const AuthProvider = ({ children }) => {
         getAuthHeader,
         checkAvailableGroupName,
         registerUser,
+        joinGroup,
         api,
     };
 

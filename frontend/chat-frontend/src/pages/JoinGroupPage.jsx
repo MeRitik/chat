@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Users, Search, Plus, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import AuthContext from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function JoinGroupPage() {
     const [groupName, setGroupName] = useState('');
     const [isChecking, setIsChecking] = useState(false);
     const [isJoining, setIsJoining] = useState(false);
     const [toast, setToast] = useState(null);
-
-    const navigate = (path) => {
-        console.log('Navigate to:', path);
-    };
+    const { joinGroup, checkAvailableGroupName } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const showToast = (type, message) => {
         setToast({ type, message });
@@ -24,41 +24,26 @@ export default function JoinGroupPage() {
 
         setIsChecking(true);
         try {
-            const response = await fetch(`/check?group=${encodeURIComponent(groupName.trim())}`);
-            const exists = await response.json();
-
+            const exists = await checkAvailableGroupName(groupName);
             if (exists) {
-                await joinGroup();
+                await handleJoinGroup();
             } else {
                 showToast('error', 'No group found with this name.');
             }
         } catch (error) {
-            console.error(error);
             showToast('error', 'Failed to check group.');
         } finally {
             setIsChecking(false);
         }
     };
 
-    const joinGroup = async () => {
-        setIsJoining(true);
-        try {
-            const response = await fetch(`/join/${encodeURIComponent(groupName.trim())}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-            });
-
-            if (response.ok) {
-                showToast('success', `Joined "${groupName}"`);
-                setTimeout(() => navigate('/chats'), 1200);
-            } else {
-                showToast('error', 'Failed to join group.');
-            }
-        } catch (error) {
-            console.error(error);
-            showToast('error', 'Error joining group.');
-        } finally {
-            setIsJoining(false);
+    const handleJoinGroup = async () => {
+        const response = await joinGroup(groupName);
+        if (response.success) {
+            showToast('success', 'Successfully joined the group: ' + response.groupName);
+            navigate('/chats');
+        } else {
+            showToast('error', 'Failed to join group.');
         }
     };
 
@@ -108,7 +93,7 @@ export default function JoinGroupPage() {
 
                     {/* Join Button */}
                     <button
-                        onClick={checkGroup}
+                        onClick={handleJoinGroup}
                         disabled={isChecking || isJoining || !groupName.trim()}
                         className="w-full py-2 text-sm font-medium rounded-md flex items-center justify-center bg-white text-black hover:bg-gray-200 transition disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                     >

@@ -7,8 +7,9 @@ import java.time.Instant;
 
 @Data
 @AllArgsConstructor
-public class AddUserToGroupDto {
+public class AddUserToGroupResponseDto {
     private String username;
     private String groupName;
     private Instant timestamp;
+    private boolean success;
 }

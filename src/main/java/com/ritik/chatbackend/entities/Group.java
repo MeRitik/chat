@@ -10,8 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Getter
@@ -28,11 +27,11 @@ public class Group {
 
     private String name;
 
-    @ManyToMany
-    List<AppUser> participants = new ArrayList<>();
+    @ManyToMany(mappedBy = "groups")
+    Set<AppUser> participants = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL)
-    List<Message> messages = new ArrayList<>();
+    Set<Message> messages = new HashSet<>();
 
     @CreatedDate
     @Column(updatable = false, nullable = false)
@@ -41,4 +40,17 @@ public class Group {
     @LastModifiedDate
     @Column(updatable = false, nullable = false)
     private Instant updatedAt;
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Group group = (Group) o;
+        return Objects.equals(id, group.id) && Objects.equals(createdAt, group.createdAt) && Objects.equals(updatedAt, group.updatedAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, createdAt, updatedAt);
+    }
+
 }

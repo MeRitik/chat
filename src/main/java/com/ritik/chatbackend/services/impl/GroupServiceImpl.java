@@ -6,6 +6,8 @@ import com.ritik.chatbackend.dtos.CreateGroupRequest;
 import com.ritik.chatbackend.dtos.GroupDto;
 import com.ritik.chatbackend.entities.AppUser;
 import com.ritik.chatbackend.entities.Group;
+import com.ritik.chatbackend.exceptions.ResourceNotFoundException;
+import com.ritik.chatbackend.exceptions.UserAlreadyInGroupException;
 import com.ritik.chatbackend.repositories.AppUserRepository;
 import com.ritik.chatbackend.repositories.GroupRepository;
 import com.ritik.chatbackend.services.GroupService;
@@ -25,12 +27,11 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public AddUserToGroupResponseDto addUserToGroup(AddUserToGroupRequestDto requestDto) {
-        Group group = groupRepository.findByName(requestDto.getGroupName()).orElseThrow(() -> new IllegalArgumentException("Group not found"));
+        Group group = groupRepository.findByName(requestDto.getGroupName()).orElseThrow(() -> new ResourceNotFoundException("Group", requestDto.getGroupName()));
         AppUser user = userRepository.findByUsername(requestDto.getUsername()).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         if(group.getParticipants().contains(user) || user.getGroups().contains(group)) {
-            log.info("User {} already in group {}", user.getUsername(), group.getName());
-            throw new IllegalArgumentException("User already in group");
+            throw new UserAlreadyInGroupException("User already in group " + requestDto.getGroupName() + " or group already contains " + requestDto.getUsername());
         }
 
         group.getParticipants().add(user);

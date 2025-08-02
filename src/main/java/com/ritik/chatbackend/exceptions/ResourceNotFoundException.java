@@ -2,9 +2,8 @@ package com.ritik.chatbackend.exceptions;
 
 import lombok.Getter;
 
-
 @Getter
-class ResourceNotFoundException extends RuntimeException {
+public class ResourceNotFoundException extends RuntimeException {
     private String resourceName;
     private String fieldName;
     private Object fieldValue;

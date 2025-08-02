@@ -2,66 +2,28 @@ import React, { useContext, useState } from 'react';
 import { Users, Search, Plus, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import AuthContext from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 export default function JoinGroupPage() {
     const [groupName, setGroupName] = useState('');
-    const [isChecking, setIsChecking] = useState(false);
-    const [isJoining, setIsJoining] = useState(false);
-    const [toast, setToast] = useState(null);
-    const { joinGroup, checkAvailableGroupName } = useContext(AuthContext);
+    const { joinGroup } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const showToast = (type, message) => {
-        setToast({ type, message });
-        setTimeout(() => setToast(null), 3000);
-    };
 
-    const checkGroup = async () => {
-        if (!groupName.trim()) {
-            showToast('error', 'Please enter a group name');
-            return;
-        }
-
-        setIsChecking(true);
-        try {
-            const exists = await checkAvailableGroupName(groupName);
-            if (exists) {
-                await handleJoinGroup();
-            } else {
-                showToast('error', 'No group found with this name.');
-            }
-        } catch (error) {
-            showToast('error', 'Failed to check group.');
-        } finally {
-            setIsChecking(false);
-        }
-    };
 
     const handleJoinGroup = async () => {
         const response = await joinGroup(groupName);
-        if (response.success) {
-            showToast('success', 'Successfully joined the group: ' + response.groupName);
-            navigate('/chats');
-        } else {
-            showToast('error', 'Failed to join group.');
+        if (response.statusCode == 409 || response.statusCode == 404) {
+            console.log(response)
+            toast.error(response.message);
+            return;
         }
+        toast.success('Successfully joined the group: ' + response.groupName);
+        navigate('/chats');
     };
 
     return (
         <div className="h-full bg-gray-900 text-white p-4 md:p-6 overflow-y-auto">
-            {/* Toast */}
-            {toast && (
-                <div className={`fixed top-5 right-5 z-50 px-4 py-2 rounded-lg text-sm shadow-lg border ${toast.type === 'success'
-                    ? 'bg-gray-800 border-green-600 text-green-400'
-                    : 'bg-gray-800 border-red-600 text-red-400'
-                    }`}>
-                    <div className="flex items-center gap-2">
-                        {toast.type === 'success' ? <CheckCircle className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
-                        <span>{toast.message}</span>
-                    </div>
-                </div>
-            )}
-
             <div className="max-w-xl mx-auto mt-5 space-y-6">
                 {/* Header */}
                 <div className="text-center space-y-2">
@@ -82,10 +44,8 @@ export default function JoinGroupPage() {
                                 type="text"
                                 value={groupName}
                                 onChange={(e) => setGroupName(e.target.value)}
-                                onKeyPress={(e) => e.key === 'Enter' && checkGroup()}
                                 placeholder="Enter group name"
                                 className="w-full pl-9 pr-3 py-2 text-sm bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-500 placeholder-gray-400"
-                                disabled={isChecking || isJoining}
                             />
                             <p className="text-xs text-gray-500 mt-1">Case-sensitive match required</p>
                         </div>
@@ -94,15 +54,9 @@ export default function JoinGroupPage() {
                     {/* Join Button */}
                     <button
                         onClick={handleJoinGroup}
-                        disabled={isChecking || isJoining || !groupName.trim()}
                         className="w-full py-2 text-sm font-medium rounded-md flex items-center justify-center bg-white text-black hover:bg-gray-200 transition disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                     >
-                        {isChecking || isJoining ? (
-                            <>
-                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                                {isChecking ? 'Checking...' : 'Joining...'}
-                            </>
-                        ) : (
+                        {(
                             <>
                                 <Plus className="w-4 h-4 mr-2" />
                                 Join Group

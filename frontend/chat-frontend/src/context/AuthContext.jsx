@@ -127,7 +127,7 @@ const AuthProvider = ({ children }) => {
             const response = await api.post('/auth/register', userData);
             return response.data;
         } catch (error) {
-            console.error('Registration error:', error);
+            console.error('Registration error:', error.message);
             throw error;
         }
     }
@@ -138,9 +138,10 @@ const AuthProvider = ({ children }) => {
                 username: user,
                 groupName
             });
+
             return response.data;
         } catch (error) {
-            console.error('Join group error:', error);
+            toast.error(error);
             throw error;
         }
     }

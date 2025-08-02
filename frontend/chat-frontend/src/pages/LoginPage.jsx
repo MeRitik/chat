@@ -3,15 +3,16 @@ import { MessageCircle, User, Mail, Lock, ArrowRight, Eye, EyeOff, MessageCircle
 import AuthContext from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import { registerUser } from '../services/api';
 
 export default function LoginPage() {
-    const { login, isAuthenticated } = useContext(AuthContext);
+    const { login, isAuthenticated, registerUser } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    if (isAuthenticated()) {
-        navigate("/");
-    }
+    useEffect(() => {
+        if (isAuthenticated()) {
+            navigate("/");
+        }
+    }, [isAuthenticated, navigate]);
 
     const [isLogin, setIsLogin] = useState(true);
     const [showPassword, setShowPassword] = useState(false);

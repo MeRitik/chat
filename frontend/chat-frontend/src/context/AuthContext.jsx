@@ -1,7 +1,15 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
+import axios from "axios";
 
-const VITE_BASE_URL = "http://localhost:8080";
+const VITE_BASE_URL = "http://localhost:8080/api/v1";
+
+const api = axios.create({
+    baseURL: VITE_BASE_URL,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
 
 const AuthContext = createContext();
 
@@ -10,6 +18,46 @@ const AuthProvider = ({ children }) => {
     const [name, setName] = useState("");
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState(localStorage.getItem("token"));
+
+    const logout = useCallback(() => {
+        setUser(null);
+        setToken(null);
+        setName("");
+        localStorage.removeItem("name");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        toast.success("Logged out successfully");
+    }, []);
+
+    useEffect(() => {
+        // Request interceptor to add token to requests
+        const requestInterceptor = api.interceptors.request.use(
+            (config) => {
+                if (token) {
+                    config.headers.Authorization = `Bearer ${token}`;
+                }
+                return config;
+            },
+            (error) => Promise.reject(error)
+        );
+
+        const responseInterceptor = api.interceptors.response.use(
+            (response) => response,
+            (error) => {
+                if (error.response?.status === 401) {
+                    // Token is invalid or expired
+                    logout();
+                    toast.error("Session expired. Please login again.");
+                }
+                return Promise.reject(error);
+            }
+        );
+
+        return () => {
+            api.interceptors.request.eject(requestInterceptor);
+            api.interceptors.response.eject(responseInterceptor);
+        };
+    }, [token, logout]);
 
     // Check if user is authenticated on component mount
     useEffect(() => {
@@ -38,24 +86,9 @@ const AuthProvider = ({ children }) => {
 
     const login = async (userData) => {
         setLoading(true);
-
         try {
-            const response = await fetch(`${VITE_BASE_URL}/api/v1/auth/login`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(userData),
-            });
-
-            if (!response.ok) {
-                toast.error("Login failed. Please check your credentials.");
-            }
-
-            const data = await response.json();
-
-            // console.log("Login response:", data);
-            setLoading(false);
+            const response = await api.post('/auth/login', userData);
+            const data = response.data;
             const { token, username, name } = data;
 
             setUser(username);
@@ -65,52 +98,39 @@ const AuthProvider = ({ children }) => {
             localStorage.setItem("token", token);
             localStorage.setItem("user", JSON.stringify(username));
             localStorage.setItem("name", name);
+
+            toast.success(`Welcome back, ${name}!`);
             return { success: true };
         } catch (error) {
-            toast.error("Login error:", error);
-            return { success: false, error: error.message };
+            const errorMessage = error.response?.data?.message || error.message || "Login failed. Please check your credentials.";
+            toast.error("Login error: " + errorMessage);
+            return { success: false, error: errorMessage };
+        } finally {
+            setLoading(false);
         }
     };
 
-    async function checkAvailableGroupName(groupName) {
+    const checkAvailableGroupName = async (groupName) => {
         try {
-            const response = await fetch(`${VITE_BASE_URL}/group/${encodeURIComponent(groupName)}/exists`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-
-            // Log the actual request headers
-            console.log('Request headers:', {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            });
-
-            if (!response.ok) {
-                throw new Error('Server error while checking group name availability');
-            }
-
-            return await response.json();
+            const response = await api.get(`/group/${encodeURIComponent(groupName)}/exists`);
+            return response.data;
         } catch (error) {
             console.error('Check group name availability error:', error);
+            const errorMessage = error.response?.data?.message || "Failed to check group name availability";
+            toast.error(errorMessage);
+            throw new Error(errorMessage);
+        }
+    };
+
+    async function registerUser(userData) {
+        try {
+            const response = await api.post('/auth/register', userData);
+            return response.data;
+        } catch (error) {
+            console.error('Registration error:', error);
+            throw error;
         }
     }
-
-    const logout = () => {
-        setUser(null);
-        setToken(null);
-        setName("");
-        localStorage.removeItem("name");
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-    };
-
-    const updateUser = (updatedUserData) => {
-        setUser(updatedUserData);
-        localStorage.setItem("user", JSON.stringify(updatedUserData));
-    };
 
     const isAuthenticated = () => !!user && !!token;
 
@@ -125,10 +145,11 @@ const AuthProvider = ({ children }) => {
         loading,
         login,
         logout,
-        updateUser,
         isAuthenticated,
         getAuthHeader,
         checkAvailableGroupName,
+        registerUser,
+        api,
     };
 
     return (

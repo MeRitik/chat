@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Users, CheckCircle, XCircle, Loader2, Shield, Plus } from 'lucide-react';
 import AuthContext from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
 export default function CreateGroupPage() {
     const [groupName, setGroupName] = useState('');
@@ -8,7 +9,7 @@ export default function CreateGroupPage() {
     const [availabilityStatus, setAvailabilityStatus] = useState(null); // null, 'checking', 'available', 'taken'
     const debounceTimeoutRef = useRef(null);
 
-    const { checkAvailableGroupName } = useContext(AuthContext);
+    const { checkAvailableGroupName, api, user } = useContext(AuthContext);
 
     // Debounced availability check
     const checkAvailability = async (name) => {
@@ -19,9 +20,9 @@ export default function CreateGroupPage() {
         setIsChecking(true);
         setAvailabilityStatus('checking');
         try {
-            const exists = await checkAvailableGroupName(name);
-            console.log(exists)
-            setAvailabilityStatus(exists === true ? 'taken' : 'available');
+            const data = await checkAvailableGroupName(name);
+            console.log(data)
+            setAvailabilityStatus(data.exists === true ? 'taken' : 'available');
         } catch (error) {
             console.error('Availability check failed:', error);
             setAvailabilityStatus(null);
@@ -58,10 +59,25 @@ export default function CreateGroupPage() {
         };
     }, []);
 
-    const handleCreateButton = () => {
-        // Empty function for now
-    };
+    const handleCreateButton = async () => {
+        try {
+            const data = await checkAvailableGroupName(groupName);
+            if (data.exists) {
+                toast.error("Group name is already taken. Please choose another.");
+                return;
+            }
 
+            const response = await api.post(`/user/${user}/group`, { name: groupName });
+
+            if (response.data.name == groupName) {
+                toast.success(`Group Created with name: ${groupName}`);
+            }
+
+        } catch (error) {
+            console.error('Availability check failed:', error);
+            setAvailabilityStatus(null);
+        }
+    };
 
     return (
         <div className="h-full bg-gray-900 text-white p-4 md:p-6 overflow-y-auto">
@@ -100,7 +116,7 @@ export default function CreateGroupPage() {
                                         <CheckCircle className="w-4 h-4 text-green-500" />
                                     )}
                                     {availabilityStatus === 'taken' && (
-                                        <XCircle className="w-4 h-4 text-red-500" />
+                                        <XCircle className="w-4 h-4  text-red-500" />
                                     )}
                                 </div>
                             )}
@@ -113,7 +129,7 @@ export default function CreateGroupPage() {
                                         }`}>
                                         {availabilityStatus === 'checking' && 'Checking...'}
                                         {availabilityStatus === 'available' && 'Available!'}
-                                        {availabilityStatus === 'taken' && 'Already taken'}
+                                        {availabilityStatus === 'taken' && 'Unavailable'}
                                     </p>
                                 )}
                             </div>

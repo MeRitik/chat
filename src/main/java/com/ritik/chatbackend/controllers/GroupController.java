@@ -1,5 +1,6 @@
 package com.ritik.chatbackend.controllers;
 
+import com.ritik.chatbackend.dtos.CheckGroupResponse;
 import com.ritik.chatbackend.dtos.CreateGroupRequest;
 import com.ritik.chatbackend.dtos.GroupDto;
 import com.ritik.chatbackend.services.GroupService;
@@ -22,7 +23,9 @@ public class GroupController {
     }
 
     @GetMapping("group/{groupName}/exists")
-    public ResponseEntity<Boolean> isGroupExists(@PathVariable String groupName) {
-        return ResponseEntity.ok(groupRepository.isGroupExists(groupName));
+    public ResponseEntity<CheckGroupResponse> isGroupExists(@PathVariable String groupName) {
+        var v = new CheckGroupResponse(groupName, groupRepository.isGroupExists(groupName));
+        System.out.println(v);
+        return ResponseEntity.ok(v);
     }
 }

@@ -1,50 +1,16 @@
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+// import { useContext } from "react";
+// import { AuthProvider } from "../context/AuthContext";
 
-export async function registerUser(userData) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/auth/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(userData),
-        });
+// const {api, user} = useContext(AuthProvider);
 
-        if (!response.ok) {
-            throw new Error('Registration failed');
-        }
+// export 
 
-        return await response.json();
-    } catch (error) {
-        console.error('Registration error:', error);
-    }
-}
-
-// export async function checkAvailableGroupName(groupName) {
-//     const token = localStorage.getItem('token');
-//     console.log('Token being used:', token); // Debug log
-    
+// export async function createGroup(groupName) {
 //     try {
-//         const response = await fetch(`${API_BASE_URL}/group/${encodeURIComponent(groupName)}/exists`, {
-//             method: 'GET',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'Authorization': `Bearer ${token}`,
-//             },
-//         });
-
-//         // Log the actual request headers
-//         console.log('Request headers:', {
-//             'Content-Type': 'application/json',
-//             'Authorization': `Bearer ${token}`,
-//         });
-
-//         if (!response.ok) {
-//             throw new Error('Server error while checking group name availability');
-//         }
-
-//         return await response.json();
-//     } catch (error) {
-//         console.error('Check group name availability error:', error);
+//         console.log(response)
+//         return response.data;
+//     } catch(e) {
+//         console.log("Error in Creating Group", e);
 //     }
+
 // }

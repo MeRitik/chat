@@ -13,11 +13,6 @@ const RequireAuth = ({ children }) => {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    if (isAuth && location.pathname === "/login") {
-        console.log("User is authenticated, redirecting to home page.");
-        return <Navigate to="/" replace />;
-    }
-
     console.log("User is authenticated, rendering children components.");
 
     return children;

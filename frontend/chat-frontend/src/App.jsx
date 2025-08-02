@@ -15,14 +15,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route
-            path="/login"
-            element={
-              <RequireAuth>
-                <LoginPage />
-              </RequireAuth>
-            }
-          />
+          <Route path="/login" element={<LoginPage />} />
 
           <Route
             path="/"

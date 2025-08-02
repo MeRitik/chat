@@ -6,7 +6,13 @@ import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../services/api';
 
 export default function LoginPage() {
+    const { login, isAuthenticated } = useContext(AuthContext);
     const navigate = useNavigate();
+
+    if (isAuthenticated()) {
+        navigate("/");
+    }
+
     const [isLogin, setIsLogin] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
@@ -18,7 +24,6 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [mounted, setMounted] = useState(false);
 
-    const { login } = useContext(AuthContext);
 
     useEffect(() => {
         setMounted(true);

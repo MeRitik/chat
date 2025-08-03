@@ -1,78 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { MessageCircle, Search, Plus, MoreHorizontal, Hash, Users, Settings, User } from 'lucide-react';
-import { Outlet, useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { MessageCircle, Search, Plus, Users } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
 import ChatInterface from '../components/ChatInterface';
+import AuthContext from '../context/AuthContext';
 
-const ChatListPage = () => {
-    const { chatId } = useParams(); // Get chatId from URL
+const ChatsListPage = () => {
+    const { groupId } = useParams();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
+    const { getAllGroups, groups } = useContext(AuthContext);
 
-    // Mock chat data - replace with your actual data source
-    const [chats] = useState([
-        {
-            id: 'general-discussion',
-            name: 'General Discussion',
-            type: 'group',
-            lastMessage: 'Hey everyone, how\'s the project going?',
-            lastMessageTime: '2m ago',
-            unreadCount: 3,
-            avatar: null,
-            isOnline: true
-        },
-        {
-            id: 'sarah-wilson',
-            name: 'Sarah Wilson',
-            type: 'direct',
-            lastMessage: 'Can we schedule a meeting for tomorrow?',
-            lastMessageTime: '5m ago',
-            unreadCount: 1,
-            avatar: null,
-            isOnline: true
-        },
-        {
-            id: 'development-team',
-            name: 'Development Team',
-            type: 'group',
-            lastMessage: 'The new feature is ready for testing',
-            lastMessageTime: '1h ago',
-            unreadCount: 0,
-            avatar: null,
-            isOnline: false
-        },
-        {
-            id: 'mike-johnson',
-            name: 'Mike Johnson',
-            type: 'direct',
-            lastMessage: 'Thanks for the update!',
-            lastMessageTime: '2h ago',
-            unreadCount: 0,
-            avatar: null,
-            isOnline: false
-        },
-        {
-            id: 'design-review',
-            name: 'Design Review',
-            type: 'group',
-            lastMessage: 'The mockups look great',
-            lastMessageTime: '1d ago',
-            unreadCount: 0,
-            avatar: null,
-            isOnline: false
-        }
-    ]);
+    useEffect(() => {
+        getAllGroups();
+    }, [getAllGroups]);
 
-    const filteredChats = chats.filter(chat =>
-        chat.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredGroups = Array.isArray(groups)
+        ? groups.filter(group =>
+            group.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        : [];
 
-    const handleChatSelect = (chat) => {
-        // Navigate to the chat URL with the chat ID
-        navigate(`/chats/${chat.id}`);
+    const handleGroupSelect = (group) => {
+        navigate(`/chats/${group.id}`);
     };
 
     const getInitials = (name) => {
-        return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
+        return name
+            ? name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2)
+            : '';
     };
 
     const getRandomGradient = (id) => {
@@ -84,24 +39,21 @@ const ChatListPage = () => {
             'from-indigo-500 to-blue-600',
             'from-yellow-500 to-orange-600'
         ];
-        // Use a simple hash function for consistent colors
-        const hashCode = id.split('').reduce((a, b) => {
+        if (!id) return gradients[0];
+        const hashCode = id.toString().split('').reduce((a, b) => {
             a = ((a << 5) - a) + b.charCodeAt(0);
             return a & a;
         }, 0);
         return gradients[Math.abs(hashCode) % gradients.length];
     };
 
-    // Find the selected chat based on URL parameter
-    const selectedChat = chats.find(chat => chat.id === chatId);
+    const selectedChat = filteredGroups.find(group => String(group.id) === String(groupId));
 
-    // Effect to handle initial load or invalid chat IDs
     useEffect(() => {
-        if (chatId && !selectedChat) {
-            // If chatId is provided but chat not found, redirect to chats list
-            navigate('/chats', { replace: true });
+        if (groupId && !selectedChat) {
+            navigate('/groups', { replace: true });
         }
-    }, [chatId, selectedChat, navigate]);
+    }, [groupId, selectedChat, navigate]);
 
     return (
         <div className="flex h-full bg-gray-900">
@@ -125,21 +77,21 @@ const ChatListPage = () => {
                 {/* Chat List */}
                 <div className="flex-1 overflow-y-auto">
                     <div className="p-2">
-                        {filteredChats.length > 0 ? (
-                            filteredChats.map((chat) => (
+                        {filteredGroups.length > 0 ? (
+                            filteredGroups.map((group) => (
                                 <div
-                                    key={chat.id}
-                                    onClick={() => handleChatSelect(chat)}
-                                    className={`flex items-center p-3 rounded-xl cursor-pointer transition-all hover:bg-gray-700 mb-1 ${chatId === chat.id ? 'bg-gray-700 border-l-2 border-blue-500' : ''
+                                    key={group.id}
+                                    onClick={() => handleGroupSelect(group)}
+                                    className={`flex items-center p-3 rounded-xl cursor-pointer transition-all hover:bg-gray-700 mb-1 ${String(groupId) === String(group.id) ? 'bg-gray-700 border-l-2 border-blue-500' : ''
                                         }`}
                                 >
                                     {/* Avatar */}
                                     <div className="relative flex-shrink-0">
-                                        <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${getRandomGradient(chat.id)} flex items-center justify-center text-white font-semibold shadow-sm`}>
-                                            {chat.type === 'group' ? (
+                                        <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${getRandomGradient(group.id)} flex items-center justify-center text-white font-semibold shadow-sm`}>
+                                            {group.type === 'group' ? (
                                                 <Users className="w-6 h-6" />
                                             ) : (
-                                                getInitials(chat.name)
+                                                getInitials(group.name)
                                             )}
                                         </div>
                                     </div>
@@ -148,23 +100,16 @@ const ChatListPage = () => {
                                     <div className="ml-3 flex-1 min-w-0">
                                         <div className="flex items-center justify-between">
                                             <h3 className="font-semibold text-white truncate">
-                                                {chat.name}
+                                                {group.name}
                                             </h3>
                                             <span className="text-xs text-gray-400 ml-2 flex-shrink-0">
-                                                {chat.lastMessageTime}
+                                                {group.lastMessageTime}
                                             </span>
                                         </div>
                                         <p className="text-sm text-gray-400 truncate mt-0.5">
-                                            {chat.lastMessage}
+                                            {group.lastMessage}
                                         </p>
                                     </div>
-
-                                    {/* Unread Count */}
-                                    {chat.unreadCount > 0 && (
-                                        <div className="ml-2 bg-blue-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
-                                            {chat.unreadCount}
-                                        </div>
-                                    )}
                                 </div>
                             ))
                         ) : (
@@ -205,4 +150,4 @@ const ChatListPage = () => {
     );
 };
 
-export default ChatListPage;
+export default ChatsListPage;

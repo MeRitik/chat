@@ -31,7 +31,7 @@ public class Group {
     Set<AppUser> participants = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL)
-    Set<Message> messages = new HashSet<>();
+    List<Message> messages = new ArrayList<>();
 
     @CreatedDate
     @Column(updatable = false, nullable = false)

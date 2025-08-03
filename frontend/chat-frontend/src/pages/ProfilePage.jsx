@@ -28,15 +28,6 @@ export default function ProfilePage() {
         fetchData();
     }, [getUserDetails]);
 
-    //  const [profileData, setProfileData] = useState({
-    //     name: 'John Doe',
-    //     username: 'johndoe',
-    //     status: 'Online',
-    //     totalChats: 142,
-    // });
-
-
-
     const [editData, setEditData] = useState({
         name: profileData?.name || '',
         username: profileData?.username || '',

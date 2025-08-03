@@ -3,7 +3,7 @@ package com.ritik.chatbackend.services.impl;
 import com.ritik.chatbackend.dtos.AddUserToGroupRequestDto;
 import com.ritik.chatbackend.dtos.AddUserToGroupResponseDto;
 import com.ritik.chatbackend.dtos.CreateGroupRequest;
-import com.ritik.chatbackend.dtos.GroupDto;
+import com.ritik.chatbackend.dtos.CreateGroupResponseDto;
 import com.ritik.chatbackend.entities.AppUser;
 import com.ritik.chatbackend.entities.Group;
 import com.ritik.chatbackend.exceptions.ResourceNotFoundException;
@@ -43,7 +43,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public GroupDto createGroup(String username, CreateGroupRequest request) {
+    public CreateGroupResponseDto createGroup(String username, CreateGroupRequest request) {
         if(request.getName() == null || request.getName().isBlank() || isGroupExists(request.getName())) {
             throw new IllegalArgumentException("Group name already exists");
         }
@@ -56,7 +56,7 @@ public class GroupServiceImpl implements GroupService {
         user.getGroups().add(saved);
         userRepository.save(user);
 
-        return new GroupDto(saved.getName());
+        return new CreateGroupResponseDto(saved.getName());
     }
 
     @Override

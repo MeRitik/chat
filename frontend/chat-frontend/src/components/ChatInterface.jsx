@@ -1,5 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 import { Send, Smile, Users, ArrowLeft } from 'lucide-react';
+import AuthContext from '../context/AuthContext';
+import { useLocation } from 'react-router-dom';
 
 const ChatInterface = () => {
     const [message, setMessage] = useState('');
@@ -61,6 +63,14 @@ const ChatInterface = () => {
             avatar: "JD"
         }
     ]);
+
+    const { fetchGroupData } = useContext(AuthContext);
+
+    const groupId = useLocation().pathname.split('/').pop();
+
+    console.log('Group ID:', groupId);
+
+    fetchGroupData(groupId);
 
     const messagesEndRef = useRef(null);
 

@@ -26,6 +26,11 @@ public class GroupServiceImpl implements GroupService {
     private final AppUserRepository userRepository;
 
     @Override
+    public Group getGroupById(Integer groupId) {
+        return groupRepository.findById(groupId).orElseThrow(() -> new ResourceNotFoundException("Group", groupId));
+    }
+
+    @Override
     public AddUserToGroupResponseDto addUserToGroup(AddUserToGroupRequestDto requestDto) {
         Group group = groupRepository.findByName(requestDto.getGroupName()).orElseThrow(() -> new ResourceNotFoundException("Group", requestDto.getGroupName()));
         AppUser user = userRepository.findByUsername(requestDto.getUsername()).orElseThrow(() -> new IllegalArgumentException("User not found"));

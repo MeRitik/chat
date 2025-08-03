@@ -167,6 +167,17 @@ const AuthProvider = ({ children }) => {
 
     }, [user]);
 
+    const fetchGroupData = useCallback(async (groupId) => {
+        try {
+            const response = await api.get(`/groups/${groupId}`);
+            console.log('Fetched group data:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching group data:', error);
+            throw error;
+        }
+    }, []);
+
     const isAuthenticated = () => !!user && !!token;
 
     const getAuthHeader = () => {
@@ -187,6 +198,7 @@ const AuthProvider = ({ children }) => {
         joinGroup,
         getUserDetails,
         getAllGroups,
+        fetchGroupData,
         groups,
         api,
     };

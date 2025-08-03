@@ -12,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -42,48 +43,40 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.CREATED).body(groupService.addUserToGroup(request));
     }
 
-//    @GetMapping("/groups")
-//    public ResponseEntity<Set<GroupDto>> getGroups(@RequestParam String username) {
-//        System.out.println(username);
-//
-//        AppUser user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User", username));
-//        Set<Group> groups = user.getGroups();
-//        Set<GroupDto> groupDtos = new HashSet<>();
-//
-//        for (Group group : groups) {
-//            Set<GroupUserDto> groupUserDtos = new HashSet<>();
-//            for (AppUser participant : group.getParticipants()) {
-//                GroupUserDto groupUser = new GroupUserDto(participant.getName(), participant.getUsername());
-//                groupUserDtos.add(groupUser);
-//            }
-//
-//            List<MessageDto> messages = new ArrayList<>();
-//            for(Message message : group.getMessages()) {
-//                MessageDto messageDto = new MessageDto();
-//                messageDto.setMessage(message.getMessage());
-//                messageDto.setSender(new GroupUserDto(message.getSender().getName(), message.getSender().getUsername()));
-//                messages.add(messageDto);
-//            }
-//
-//
-//            GroupDto groupDto = GroupDto.builder()
-//                    .id(group.getId())
-//                    .type(group.getParticipants().size() > 2 ? "group" : "direct")
-//                    .name(group.getName())
-//                    .participants(groupUserDtos)
-//                    .messages(messages)
-//                    .lastMessage(!messages.isEmpty() ? messages.getLast().getMessage() : null)
-//                    .totalParticipants(group.getParticipants().size())
-//                    .totalMessages(group.getMessages().size())
-//                    .build();
-//
-//            groupDtos.add(groupDto);
-//        }
-//
-//        groupDtos.forEach(System.out::println);
-//
-//        return ResponseEntity.ok(groupDtos);
-//    }
+    @GetMapping("/groups/{groupId}")
+    public ResponseEntity<GroupDto> getGroup(@PathVariable Integer groupId, Model model) {
+        Group group = groupService.getGroupById(groupId);
+
+        Set<GroupUserDto> participantsListDto = new HashSet<>();
+        List<MessageDto> messagesListDto = new ArrayList<>();
+
+        for (AppUser user : group.getParticipants()) {
+            participantsListDto.add(modelMapper.map(user, GroupUserDto.class));
+        }
+
+        for (Message message : group.getMessages()) {
+            MessageDto messageDto = new MessageDto();
+            messageDto.setSender(modelMapper.map(message.getSender(), GroupUserDto.class));
+            messageDto.setMessage(message.getMessage());
+            messageDto.setTimestamp(message.getTimestamp());
+
+            messagesListDto.add(messageDto);
+        }
+
+        GroupDto groupDto = GroupDto.builder()
+                .id(group.getId())
+                .name(group.getName())
+                .type(group.getParticipants().size() > 2 ? "group" : "direct")
+                .totalParticipants(group.getParticipants().size())
+                .totalMessages(group.getMessages().size())
+                .lastMessage(group.getMessages().isEmpty() ? null : group.getMessages().getLast().getMessage())
+                .lastMessageTimestamp(group.getMessages().isEmpty() ? null : group.getMessages().getLast().getTimestamp().toString())
+                .participants(participantsListDto)
+                .messages(messagesListDto)
+                .build();
+
+        return ResponseEntity.ok(groupDto);
+    }
 
     @GetMapping("/groups")
     public ResponseEntity<List<GroupDataDto>> getGroups(@RequestParam String username) {

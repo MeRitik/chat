@@ -11,4 +11,6 @@ public interface GroupService {
     boolean isGroupExists(String groupName);
     Group getGroupByName(String groupName);
     AddUserToGroupResponseDto addUserToGroup(AddUserToGroupRequestDto requestDto);
+
+    Group getGroupById(Integer groupId);
 }

@@ -1,4 +1,4 @@
 package com.ritik.chatbackend.dtos;
 
-public class MessageDto {
+public class GroupDataDto {
 }

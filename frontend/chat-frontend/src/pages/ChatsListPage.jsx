@@ -5,7 +5,7 @@ import ChatInterface from '../components/ChatInterface';
 import AuthContext from '../context/AuthContext';
 
 const ChatsListPage = () => {
-    const { groupId } = useParams();
+    const { chatId } = useParams();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const { getAllGroups, groups } = useContext(AuthContext);
@@ -47,13 +47,13 @@ const ChatsListPage = () => {
         return gradients[Math.abs(hashCode) % gradients.length];
     };
 
-    const selectedChat = filteredGroups.find(group => String(group.id) === String(groupId));
+    const selectedChat = filteredGroups.find(group => String(group.id) === String(chatId));
 
     useEffect(() => {
-        if (groupId && !selectedChat) {
+        if (chatId && !selectedChat) {
             navigate('/groups', { replace: true });
         }
-    }, [groupId, selectedChat, navigate]);
+    }, [chatId, selectedChat, navigate]);
 
     return (
         <div className="flex h-full bg-gray-900">
@@ -82,7 +82,7 @@ const ChatsListPage = () => {
                                 <div
                                     key={group.id}
                                     onClick={() => handleGroupSelect(group)}
-                                    className={`flex items-center p-3 rounded-xl cursor-pointer transition-all hover:bg-gray-700 mb-1 ${String(groupId) === String(group.id) ? 'bg-gray-700 border-l-2 border-blue-500' : ''
+                                    className={`flex items-center p-3 rounded-xl cursor-pointer transition-all hover:bg-gray-700 mb-1 ${String(chatId) === String(group.id) ? 'bg-gray-700 border-l-2 border-blue-500' : ''
                                         }`}
                                 >
                                     {/* Avatar */}

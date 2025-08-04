@@ -3,6 +3,7 @@ import { MessageCircle, Search, Plus, Users } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ChatInterface from '../components/ChatInterface';
 import AuthContext from '../context/AuthContext';
+import NoChatSelected from '../components/NoChatSelected';
 
 const ChatsListPage = () => {
     const { chatId } = useParams();
@@ -128,23 +129,7 @@ const ChatsListPage = () => {
                     <div className="flex-1 bg-gray-900 text-white">
                         <ChatInterface selectedChat={selectedChat} />
                     </div>
-                ) : (
-                    <div className="flex-1 flex items-center justify-center bg-gray-900">
-                        <div className="text-center max-w-md">
-                            <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                                <MessageCircle className="w-12 h-12 text-white" />
-                            </div>
-                            <h2 className="text-3xl font-bold text-white mb-3">Welcome to ChatFlow</h2>
-                            <p className="text-gray-400 mb-8 leading-relaxed">
-                                Select a chat from the sidebar to start messaging, or create a new conversation to get started.
-                            </p>
-                            <button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
-                                <Plus className="w-5 h-5 inline mr-2" />
-                                Start New Chat
-                            </button>
-                        </div>
-                    </div>
-                )}
+                ) : <NoChatSelected />}
             </div>
         </div>
     );

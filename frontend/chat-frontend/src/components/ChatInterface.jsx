@@ -1,8 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Smile, Users, ArrowLeft } from 'lucide-react';
+import { Send, Smile, Users } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import ChatHeader from './ChatHeader';
+import { formatTimestamp, getAvatarGradient } from '../utils/utils';
+import ChatLoading from './ChatLoading';
+import ChatError from './ChatError';
+import NoChat from './NoChat';
 
 const ChatInterface = () => {
     const [message, setMessage] = useState('');
@@ -45,7 +49,7 @@ const ChatInterface = () => {
                 sender: msg.sender.name,
                 username: msg.sender.username,
                 timestamp: formatTimestamp(msg.timestamp),
-                isOwn: msg.sender.username === user?.username, // Assuming user object has username
+                isOwn: msg.sender.username === user?.username,
                 avatar: getInitials(msg.sender.name)
             }));
             setMessages(formattedMessages);
@@ -59,22 +63,6 @@ const ChatInterface = () => {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
-
-    const formatTimestamp = (timestamp) => {
-        if (!timestamp) return '';
-
-        const date = new Date(timestamp);
-        const now = new Date();
-        const diffInHours = (now - date) / (1000 * 60 * 60);
-
-        if (diffInHours < 24) {
-            // Show time for messages from today
-            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        } else {
-            // Show date for older messages
-            return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-        }
-    };
 
     const getInitials = (name) => {
         if (!name) return 'U';
@@ -122,62 +110,10 @@ const ChatInterface = () => {
         }
     };
 
-    const getAvatarGradient = (name) => {
-        const gradients = [
-            'from-purple-500 to-pink-500',
-            'from-blue-500 to-cyan-500',
-            'from-green-500 to-emerald-500',
-            'from-orange-500 to-red-500',
-            'from-indigo-500 to-purple-500',
-            'from-teal-500 to-blue-500'
-        ];
-        const index = (name ? name.charCodeAt(0) : 0) % gradients.length;
-        return gradients[index];
-    };
+    { loading && <ChatLoading /> }
+    { error && <ChatError error={error} /> }
 
-    // Loading state
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-screen bg-gray-900 text-white">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                    <p className="text-gray-400">Loading chat...</p>
-                </div>
-            </div>
-        );
-    }
-
-    // Error state
-    if (error) {
-        return (
-            <div className="flex items-center justify-center h-screen bg-gray-900 text-white">
-                <div className="text-center">
-                    <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Users className="w-8 h-8 text-red-400" />
-                    </div>
-                    <p className="text-red-400 mb-2">{error}</p>
-                    <button
-                        onClick={() => window.location.reload()}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
-                    >
-                        Retry
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    // No group data state
-    if (!currentGroupData) {
-        return (
-            <div className="flex items-center justify-center h-screen bg-gray-900 text-white">
-                <div className="text-center">
-                    <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-400">Chat not found</p>
-                </div>
-            </div>
-        );
-    }
+    { !currentGroupData && <NoChat /> }
 
     const isDirectMessage = currentGroupData.type === 'direct';
 

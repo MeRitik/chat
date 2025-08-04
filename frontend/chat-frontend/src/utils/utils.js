@@ -26,3 +26,9 @@ export const getAvatarGradient = (name) => {
         const index = (name ? name.charCodeAt(0) : 0) % gradients.length;
         return gradients[index];
     };
+
+export function formatDate (date) {
+    if (!date) return '';
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(date).toLocaleDateString(undefined, options);
+}

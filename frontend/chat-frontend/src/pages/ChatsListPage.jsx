@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import ChatInterface from '../components/ChatInterface';
 import AuthContext from '../context/AuthContext';
 import NoChatSelected from '../components/NoChatSelected';
+import { formatDate } from '../utils/utils';
 
 const ChatsListPage = () => {
     const { chatId } = useParams();
@@ -104,7 +105,7 @@ const ChatsListPage = () => {
                                                 {group.name}
                                             </h3>
                                             <span className="text-xs text-gray-400 ml-2 flex-shrink-0">
-                                                {group.lastMessageTime}
+                                                {formatDate(group.lastMessageTime)}
                                             </span>
                                         </div>
                                         <p className="text-sm text-gray-400 truncate mt-0.5">

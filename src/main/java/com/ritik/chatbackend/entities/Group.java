@@ -30,7 +30,7 @@ public class Group {
     @ManyToMany(mappedBy = "groups")
     Set<AppUser> participants = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Message> messages = new ArrayList<>();
 
     @CreatedDate
@@ -38,7 +38,7 @@ public class Group {
     private Instant createdAt;
 
     @LastModifiedDate
-    @Column(updatable = false, nullable = false)
+    @Column(nullable = false)
     private Instant updatedAt;
 
     @Override

@@ -7,7 +7,7 @@ import java.time.Instant;
 
 @Getter
 @Setter
-public class MessageResponseDto {
+public class MessageRequestDto {
     private GroupUserDto sender;
     private CreateGroupResponseDto group;
     private String message;

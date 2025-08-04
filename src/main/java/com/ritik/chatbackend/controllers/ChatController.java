@@ -1,5 +1,6 @@
 package com.ritik.chatbackend.controllers;
 
+import com.ritik.chatbackend.dtos.MessageRequestDto;
 import com.ritik.chatbackend.dtos.MessageResponseDto;
 import com.ritik.chatbackend.entities.AppUser;
 import com.ritik.chatbackend.entities.Group;
@@ -24,13 +25,16 @@ public class ChatController {
     private final MessageRepository messageRepository;
     private final ModelMapper modelMapper;
 
-    @MessageMapping("/sendMessage/{groupame}") // Maps to /app/sendMessage/{groupname}
-    @SendTo("/topic/group/{groupname}")        // Clients subscribe to /topic/group/{groupname}
+    @MessageMapping("/sendMessage/{groupId}") // Maps to /app/sendMessage/{groupname}
+    @SendTo("/topic/group/{groupId}")        // Clients subscribe to /topic/group/{groupname}
     public MessageResponseDto sendMessage(
-            @DestinationVariable String groupname,
-            @Payload MessageResponseDto message) {
+            @DestinationVariable Integer groupId,
+            @Payload MessageRequestDto message) {
 
-        Group group = groupService.getGroupByName(groupname);
+        System.out.println(message);
+        System.out.println("Broadcasting to topic: /topic/group/" + groupId);
+
+        Group group = groupService.getGroupById(groupId);
         AppUser sender = appUserServices.findByUsername(message.getSender().getUsername());
 
         Message msg = new Message();
@@ -39,7 +43,7 @@ public class ChatController {
         msg.setSender(sender);
 
         messageRepository.save(msg);
-        group.getMessages().add(msg);
+//        group.getMessages().add(msg);
 
         return modelMapper.map(msg, MessageResponseDto.class);
     }

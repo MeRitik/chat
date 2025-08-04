@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
+import SockJS from 'sockjs-client';
+import { Stomp } from '@stomp/stompjs';
 import { Send, Smile, Users, ArrowLeft } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
@@ -9,12 +11,13 @@ import NoChat from './NoChat';
 import ChatError from './ChatError';
 
 const ChatInterface = () => {
+    const stompClientRef = useRef(null);
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const { fetchGroupData, currentGroupData, user } = useAuth();
+    const { fetchGroupData, currentGroupData, name, user } = useAuth();
 
     const location = useLocation();
     const groupId = location.pathname.split('/').pop();
@@ -36,9 +39,43 @@ const ChatInterface = () => {
                 }
             }
         };
-
         loadGroupData();
     }, [groupId, fetchGroupData]);
+
+    // Connect to WebSocket and subscribe to group topic
+    useEffect(() => {
+        if (!groupId || !user) return;
+        const socket = new SockJS('http://localhost:8080/chat');
+        const stompClient = Stomp.over(socket);
+        stompClient.connect({}, () => {
+            stompClient.subscribe(`/topic/group/${groupId}`, (msg) => {
+                const body = JSON.parse(msg.body);
+                // console.log('Received message:', body);
+                // console.log(user)
+
+                if (body.sender.username === user) {
+                    return;
+                }
+
+                setMessages(prev => [
+                    ...prev,
+                    {
+                        id: body.id,
+                        text: body.message,
+                        sender: body.sender.name,
+                        username: body.sender.username,
+                        timestamp: formatTimestamp(body.timestamp),
+                        isOwn: body.sender.username === user?.username,
+                        avatar: getInitials(body.sender.name)
+                    }
+                ]);
+            });
+            stompClientRef.current = stompClient;
+        });
+        return () => {
+            stompClient.disconnect();
+        };
+    }, [groupId, user]);
 
     // Update messages when currentGroupData changes
     useEffect(() => {
@@ -49,12 +86,14 @@ const ChatInterface = () => {
                 sender: msg.sender.name,
                 username: msg.sender.username,
                 timestamp: formatTimestamp(msg.timestamp),
-                isOwn: msg.sender.username === user?.username, // Assuming user object has username
+                isOwn: msg.sender.username === user,
                 avatar: getInitials(msg.sender.name)
             }));
             setMessages(formattedMessages);
         }
-    }, [currentGroupData, user]);
+        // Only run when groupId changes (not on every message/user change)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [groupId]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -74,40 +113,35 @@ const ChatInterface = () => {
 
     const handleSendMessage = async (e) => {
         if (e) e.preventDefault();
+        if (!stompClientRef.current || !message.trim()) return;
 
-        if (!message.trim() || !user) return;
+        const messageData = {
+            sender: { name, username: user },
+            group: { name: currentGroupData.name },
+            message: message.trim(),
+            timestamp: new Date().toISOString()
+        };
 
-        try {
-            // Create the message object to send to API
-            const messageData = {
-                message: message.trim(),
-                groupId: parseInt(groupId)
-            };
-
-            // TODO: Replace with your actual API call
-            // const response = await sendMessageToGroup(messageData);
-
-            // For now, add message optimistically to UI
-            const newMessage = {
-                id: messages.length + 1,
-                text: message.trim(),
-                sender: user.name || user.username,
-                username: user.username,
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        // Optimistically add message to UI
+        setMessages(prev => [
+            ...prev,
+            {
+                id: prev.length + 1,
+                text: messageData.message,
+                sender: messageData.sender.name,
+                username: messageData.sender.username,
+                timestamp: formatTimestamp(messageData.timestamp),
                 isOwn: true,
-                avatar: getInitials(user.name || user.username)
-            };
+                avatar: getInitials(messageData.sender.name)
+            }
+        ]);
 
-            setMessages(prevMessages => [...prevMessages, newMessage]);
-            setMessage('');
-
-            // TODO: After successful API call, you might want to refetch group data
-            // or handle the response to update the UI with server data
-
-        } catch (error) {
-            console.error('Error sending message:', error);
-            // Handle error - maybe show a toast notification
-        }
+        stompClientRef.current.send(
+            `/app/sendMessage/${groupId}`,
+            {},
+            JSON.stringify(messageData)
+        );
+        setMessage('');
     };
 
     if (loading) {
@@ -127,9 +161,7 @@ const ChatInterface = () => {
     return (
         <div className="flex flex-col h-screen bg-gray-900 text-white">
             {/* Header */}
-
             <ChatHeader />
-
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.length === 0 ? (
@@ -152,7 +184,6 @@ const ChatInterface = () => {
                                         {msg.avatar}
                                     </div>
                                 )}
-
                                 <div className={`${msg.isOwn ? 'mr-2' : 'ml-2'}`}>
                                     {!msg.isOwn && !isDirectMessage && (
                                         <p className="text-xs text-gray-400 mb-1 ml-1">{msg.sender}</p>
@@ -173,7 +204,6 @@ const ChatInterface = () => {
                 )}
                 <div ref={messagesEndRef} />
             </div>
-
             {/* Message Input */}
             <div className="p-4 bg-gray-800 border-t border-gray-700">
                 <div className="flex items-center space-x-3">
@@ -194,11 +224,10 @@ const ChatInterface = () => {
                             <Smile className="w-5 h-5 text-gray-400" />
                         </button>
                     </div>
-
                     <button
                         type="button"
                         onClick={handleSendMessage}
-                        disabled={!message.trim()}
+                        disabled={!message.trim() || !stompClientRef.current}
                         className="p-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-full transition-colors"
                     >
                         <Send className="w-5 h-5 text-white" />

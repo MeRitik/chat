@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Send, Smile, Users, ArrowLeft } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import ChatHeader from './ChatHeader';
 
 const ChatInterface = () => {
     const [message, setMessage] = useState('');
@@ -179,29 +180,13 @@ const ChatInterface = () => {
     }
 
     const isDirectMessage = currentGroupData.type === 'direct';
-    const chatTitle = currentGroupData.name;
-    const onlineCount = currentGroupData.participants?.length || 0;
+
 
     return (
         <div className="flex flex-col h-screen bg-gray-900 text-white">
             {/* Header */}
-            <div className="flex items-center justify-between p-2 bg-gray-800 border-b border-gray-700">
-                <div className="flex items-center space-x-3">
-                    <button className="p-2 hover:bg-gray-700 rounded-lg transition-colors lg:hidden">
-                        <ArrowLeft className="w-5 h-5" />
-                    </button>
-                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                        <Users className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                        <h2 className="font-semibold text-lg">{chatTitle}</h2>
-                        <p className="text-sm text-gray-400">
-                            {currentGroupData.totalParticipants} member{currentGroupData.totalParticipants !== 1 ? 's' : ''}
-                            {onlineCount > 0 && ` • ${onlineCount} online`}
-                        </p>
-                    </div>
-                </div>
-            </div>
+
+            <ChatHeader />
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">

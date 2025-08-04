@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { MessageCircle, User, Users, MessageSquare, Settings, LogOut, Search, MessageSquarePlus } from 'lucide-react';
-import AuthContext from '../context/AuthContext';
 import { useAuth } from '../hooks/useAuth';
 
 export default function Index() {

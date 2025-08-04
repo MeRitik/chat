@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Smile, Users } from 'lucide-react';
+import { Send, Smile, Users, ArrowLeft } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import ChatHeader from './ChatHeader';
 import { formatTimestamp, getAvatarGradient } from '../utils/utils';
 import ChatLoading from './ChatLoading';
-import ChatError from './ChatError';
 import NoChat from './NoChat';
+import ChatError from './ChatError';
 
 const ChatInterface = () => {
     const [message, setMessage] = useState('');
@@ -49,7 +49,7 @@ const ChatInterface = () => {
                 sender: msg.sender.name,
                 username: msg.sender.username,
                 timestamp: formatTimestamp(msg.timestamp),
-                isOwn: msg.sender.username === user?.username,
+                isOwn: msg.sender.username === user?.username, // Assuming user object has username
                 avatar: getInitials(msg.sender.name)
             }));
             setMessages(formattedMessages);
@@ -110,13 +110,19 @@ const ChatInterface = () => {
         }
     };
 
-    { loading && <ChatLoading /> }
-    { error && <ChatError error={error} /> }
+    if (loading) {
+        return <ChatLoading />;
+    }
 
-    { !currentGroupData && <NoChat /> }
+    if (error) {
+        return <ChatError error={error} />;
+    }
+
+    if (!currentGroupData) {
+        return <NoChat />;
+    }
 
     const isDirectMessage = currentGroupData.type === 'direct';
-
 
     return (
         <div className="flex flex-col h-screen bg-gray-900 text-white">

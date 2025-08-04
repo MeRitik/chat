@@ -19,6 +19,7 @@ const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState(localStorage.getItem("token"));
     const [groups, setGroups] = useState([]);
+    const [currentGroupData, setCurrentGroupData] = useState(null);
 
     const logout = useCallback(() => {
         setUser(null);
@@ -170,8 +171,7 @@ const AuthProvider = ({ children }) => {
     const fetchGroupData = useCallback(async (groupId) => {
         try {
             const response = await api.get(`/groups/${groupId}`);
-            console.log('Fetched group data:', response.data);
-            return response.data;
+            setCurrentGroupData(response.data);
         } catch (error) {
             console.error('Error fetching group data:', error);
             throw error;
@@ -199,6 +199,8 @@ const AuthProvider = ({ children }) => {
         getUserDetails,
         getAllGroups,
         fetchGroupData,
+        currentGroupData,
+        setCurrentGroupData,
         groups,
         api,
     };

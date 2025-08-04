@@ -2,12 +2,13 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { MessageCircle, User, Users, MessageSquare, Settings, LogOut, Search, MessageSquarePlus } from 'lucide-react';
 import AuthContext from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 export default function Index() {
     const [mounted, setMounted] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
-    const { logout } = useContext(AuthContext);
+    const { logout, user } = useAuth();
 
     // Get current active tab from URL
     const getCurrentTab = () => {
@@ -129,7 +130,7 @@ export default function Index() {
                             <User className="w-5 h-5 text-gray-300" />
                         </div>
                         <div className="flex-1">
-                            <p className="text-sm font-medium text-white">John Doe</p>
+                            <p className="text-sm font-medium text-white">{user}</p>
                             <p className="text-xs text-gray-400">Online</p>
                         </div>
                     </div>

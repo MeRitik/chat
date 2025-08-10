@@ -1,6 +1,5 @@
 package com.ritik.chatbackend.security;
 
-import com.ritik.chatbackend.services.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

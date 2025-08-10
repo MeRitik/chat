@@ -1,6 +1,7 @@
-package com.ritik.chatbackend.services;
+package com.ritik.chatbackend.security;
 
 import com.ritik.chatbackend.entities.AppUser;
+import com.ritik.chatbackend.services.AppUserService;
 import com.ritik.chatbackend.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

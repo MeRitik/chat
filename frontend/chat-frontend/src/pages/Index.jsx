@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { MessageCircle, User, Users, MessageSquare, Settings, LogOut, Search, MessageSquarePlus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MessageCircle, User, Users, MessageSquare, Settings, LogOut, Search, MessageSquarePlus, ChevronLeft, ChevronRight, X, Menu } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import IndexHeader from '../components/IndexHeader';
 
@@ -97,32 +97,31 @@ export default function Index() {
                 ))}
             </div>
 
+            {/* Toggle Button - positioned absolutely on the page, not inside sidebar */}
+            <button
+                onClick={toggleSidebar}
+                className={`
+        fixed top-1/2 -translate-y-1/2 z-50
+        bg-gray-700 hover:bg-gray-600 text-white p-1.5 rounded-full 
+        border border-gray-600 shadow-lg 
+        transition-all duration-300 hover:scale-110 
+        focus:outline-none
+    `}
+                style={{ left: `${isSidebarShrunk ? '60px' : '240px'}` }}
+                aria-label="Toggle Sidebar"
+            >
+                {isSidebarShrunk ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+            </button>
 
             {/* Sidebar */}
             <div className={`
-                ${isSidebarShrunk ? 'w-20' : 'w-64'} 
-                bg-gray-800 border-r border-gray-700 flex flex-col 
-                transform transition-all duration-300 ease-in-out
-                ${mounted ? 'translate-x-0' : '-translate-x-4'} 
-                relative z-10
-            `}>
+    ${isSidebarShrunk ? 'w-20' : 'w-64'} 
+    bg-gray-800 border-r border-gray-700 flex flex-col 
+    transform transition-all duration-300 ease-in-out
+    ${mounted ? 'translate-x-0' : '-translate-x-4'} 
+    relative z-10
+`}>
                 <IndexHeader isShrunk={isSidebarShrunk} />
-
-
-                {/* Toggle Button */}
-                <button
-                    onClick={toggleSidebar}
-                    className={`
-                        absolute -right-3 top-1/2 -translate-y-1/2 
-                        bg-gray-700 text-white p-1 rounded-full 
-                        border border-gray-600 shadow-lg 
-                        transition-transform duration-300 hover:scale-110 
-                        focus:outline-none
-                    `}
-                    aria-label="Toggle Sidebar"
-                >
-                    {isSidebarShrunk ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-                </button>
 
 
                 {/* Navigation */}
@@ -199,7 +198,7 @@ export default function Index() {
                                 ${isSidebarShrunk ? 'w-full' : ''}
                                 flex items-center justify-center 
                                 px-3 py-2 bg-gray-700 hover:bg-red-600 rounded-lg 
-                                text-gray-300 hover:text-white transition-all duration-200
+                                text-gray-300 hover:text-white transition-all duration-200 text-sm gap-2
                             `}
                         >
                             <LogOut className="w-4 h-4" />

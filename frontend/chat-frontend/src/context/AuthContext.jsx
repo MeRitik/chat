@@ -36,6 +36,11 @@ const AuthProvider = ({ children }) => {
         const requestInterceptor = api.interceptors.request.use(
             (config) => {
                 if (token) {
+                    if (isTokenExpired(token)) {
+                        logout();
+                        toast.error("Session expired. Please login again.");
+                        return Promise.reject(new Error("Token expired"));
+                    }
                     config.headers.Authorization = `Bearer ${token}`;
                 }
                 return config;
@@ -46,7 +51,7 @@ const AuthProvider = ({ children }) => {
         const responseInterceptor = api.interceptors.response.use(
             (response) => response,
             (error) => {
-                if (error.response?.status === 401) {
+                if (error.response?.status === 401 || error.response?.status === 403) {
                     // Token is invalid or expired
                     logout();
                     toast.error("Session expired. Please login again.");
@@ -85,6 +90,17 @@ const AuthProvider = ({ children }) => {
 
         checkAuthStatus();
     }, []);
+
+    const isTokenExpired = (token) => {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const exp = payload.exp * 1000;
+            return Date.now() > exp;
+        } catch (error) {
+            console.error("Error checking token expiration:", error);
+            return true;
+        }
+    };
 
     const login = async (userData) => {
         setLoading(true);

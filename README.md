@@ -170,7 +170,7 @@ The frontend will start on `http://localhost:5173`
 Update JWT settings in `application.properties`:
 ```properties
 jwt.secret=your-secret-key
-jwt.expiration=36000000  # 10 hours in milliseconds
+jwt.expiration=jwt-expiration-time (in ms)
 ```
 
 ### WebSocket Configuration
@@ -241,26 +241,8 @@ npm run build
   - Support for fuzzy search and auto-completion
 
 ### 🎯 Additional Features
-- **File Sharing**: Support for image, document, and media sharing
-- **Message Reactions**: Emoji reactions and message threading
-- **Push Notifications**: Real-time notifications for offline users
-- **Voice/Video Calls**: WebRTC integration for audio/video communication
 - **Message Encryption**: End-to-end encryption for secure communication
 - **Admin Dashboard**: Administrative interface for user and group management
-
-### 🏗️ Infrastructure
-- **Redis Caching**: Implement caching for frequently accessed data
-- **Docker Containerization**: Package application with Docker for easy deployment
-- **Kubernetes Orchestration**: Enable container orchestration for production deployment
-- **Monitoring & Observability**: Integration with Prometheus, Grafana, and ELK stack
-- **API Rate Limiting**: Implement rate limiting to prevent abuse
-- **Load Balancing**: Configure load balancers for high availability
-
-### 🔒 Security Enhancements
-- **OAuth2 Integration**: Support for Google, GitHub, and other OAuth providers
-- **Two-Factor Authentication**: Enhanced security with 2FA
-- **Message Moderation**: Automated content filtering and moderation tools
-- **Audit Logging**: Comprehensive logging for security and compliance
 
 ## 🤝 Contributing
 

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { MessageCircle, User, Users, MessageSquare, Settings, LogOut, Search, MessageSquarePlus, ChevronLeft, ChevronRight, X, Menu } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import IndexHeader from '../components/IndexHeader';
+import AuthContext from '../context/AuthContext';
 
 
 export default function Index() {
@@ -11,6 +12,7 @@ export default function Index() {
     const navigate = useNavigate();
     const location = useLocation();
     const { logout, user } = useAuth();
+    const { groupCount } = useContext(AuthContext);
 
 
     // Get current active tab from URL
@@ -51,7 +53,7 @@ export default function Index() {
             path: '/chats',
             icon: MessageSquare,
             label: 'Chats',
-            count: 12
+            count: groupCount
         },
         {
             id: 'groups',

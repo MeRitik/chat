@@ -2,7 +2,7 @@ import { createContext, useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
 
-const VITE_BASE_URL = "http://localhost:8080/api/v1";
+const VITE_BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:8080';
 
 const api = axios.create({
     baseURL: VITE_BASE_URL,
@@ -200,6 +200,8 @@ const AuthProvider = ({ children }) => {
         return token ? { Authorization: `Bearer ${token}` } : {};
     };
 
+    const groupCount = groups?.length || 0;
+
     const value = {
         user,
         name,
@@ -219,6 +221,7 @@ const AuthProvider = ({ children }) => {
         setCurrentGroupData,
         groups,
         api,
+        groupCount
     };
 
     return (

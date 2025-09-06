@@ -25,6 +25,23 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [mounted, setMounted] = useState(false);
 
+    const [backgroundShapes] = useState(() =>
+        Array.from({ length: 12 }, (_, i) => ({
+            left: `${(i % 4) * 25 + Math.random() * 10}%`,
+            top: `${Math.floor(i / 4) * 33 + Math.random() * 10}%`,
+            animationDelay: `${i * 0.8}s`,
+            animationDuration: `${3 + Math.random() * 2}s`,
+            size: 16 + Math.random() * 8
+        }))
+    );
+
+    const [backgroundDots] = useState(() =>
+        Array.from({ length: 8 }, (_, i) => ({
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            animationDelay: `${i * 1.2}s`
+        }))
+    );
 
     useEffect(() => {
         setMounted(true);
@@ -123,19 +140,19 @@ export default function LoginPage() {
         <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4 relative overflow-hidden">
             {/* Subtle animated background */}
             <div className="absolute inset-0 opacity-5">
-                {Array.from({ length: 12 }, (_, i) => (
+                {backgroundShapes.map((shape, i) => (
                     <div
                         key={i}
                         className="absolute animate-pulse"
                         style={{
-                            left: `${(i % 4) * 25 + Math.random() * 10}%`,
-                            top: `${Math.floor(i / 4) * 33 + Math.random() * 10}%`,
-                            animationDelay: `${i * 0.8}s`,
-                            animationDuration: `${3 + Math.random() * 2}s`
+                            left: shape.left,
+                            top: shape.top,
+                            animationDelay: shape.animationDelay,
+                            animationDuration: shape.animationDuration
                         }}
                     >
                         <MessageCircle
-                            size={16 + Math.random() * 8}
+                            size={shape.size}
                             className="text-white transform rotate-12"
                         />
                     </div>
@@ -164,14 +181,14 @@ export default function LoginPage() {
 
             {/* Moving dots animation */}
             <div className="absolute inset-0 opacity-10">
-                {Array.from({ length: 8 }, (_, i) => (
+                {backgroundDots.map((dot, i) => (
                     <div
                         key={`dot-${i}`}
                         className="absolute w-1 h-1 bg-white rounded-full animate-ping"
                         style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                            animationDelay: `${i * 1.2}s`,
+                            left: dot.left,
+                            top: dot.top,
+                            animationDelay: dot.animationDelay,
                             animationDuration: '4s'
                         }}
                     />

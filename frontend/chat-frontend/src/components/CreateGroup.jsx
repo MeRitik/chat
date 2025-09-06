@@ -30,17 +30,14 @@ export default function CreateGroupPage() {
         setIsChecking(false);
     };
 
-    // Handle input change with debouncing
     const handleGroupNameChange = (e) => {
         const value = e.target.value;
         setGroupName(value);
 
-        // Clear previous timeout
         if (debounceTimeoutRef.current) {
             clearTimeout(debounceTimeoutRef.current);
         }
 
-        // Set new timeout for debounced check
         if (value.trim().length >= 3) {
             debounceTimeoutRef.current = setTimeout(() => {
                 checkAvailability(value.trim());
@@ -50,7 +47,6 @@ export default function CreateGroupPage() {
         }
     };
 
-    // Cleanup timeout on unmount
     useEffect(() => {
         return () => {
             if (debounceTimeoutRef.current) {
@@ -87,8 +83,8 @@ export default function CreateGroupPage() {
                     <div className="w-14 h-14 bg-gray-800 rounded-full mx-auto flex items-center justify-center border border-gray-700">
                         <Users className="w-6 h-6 text-gray-300" />
                     </div>
-                    <h1 className="text-xl font-semibold">Check Group Name</h1>
-                    <p className="text-sm text-gray-400">Check if your group name is available</p>
+                    <h1 className="text-xl font-semibold">Create a Group</h1>
+                    <p className="text-sm text-gray-400">Check if the group name is available</p>
                 </div>
 
                 {/* Form */}

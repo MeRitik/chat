@@ -45,7 +45,7 @@ const ChatInterface = () => {
     // Connect to WebSocket and subscribe to group topic
     useEffect(() => {
         if (!groupId || !user) return;
-        const socket = new SockJS('http://localhost:8080/chat');
+        const socket = new SockJS(`${import.meta.env.VITE_BASE_URL}/chat`);
         const stompClient = Stomp.over(socket);
         stompClient.connect({}, () => {
             stompClient.subscribe(`/topic/group/${groupId}`, (msg) => {
